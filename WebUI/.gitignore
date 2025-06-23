@@ -1,0 +1,45 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+
+*.settings.py
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Environment folders
+env/
+venv/
+ENV/
+
+# Django SQLite DB
+db.sqlite3
+
+# Django secret keys (if using .env files)
+.env
+.env.*
+
+# Logs
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# VS Code and JetBrains IDEs
+.vscode/
+.idea/
+
+# Static and media files (optional)
+staticfiles/
+media/
+
+# Compiled files and caches
+*.egg-info/
+*.egg
+.cache/
+*.coverage
+htmlcov/
+
+# Migrations cache
+**/__pycache__/

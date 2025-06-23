@@ -62,7 +62,7 @@ DiaPredict is a machine learning project that uses a Support Vector Machine (SVM
 - Visualize feature importance and confusion matrix
 
 ---
-
+ 
 ## 📬 Contact
 
 If you have feedback, suggestions, or collaboration ideas, feel free to connect:

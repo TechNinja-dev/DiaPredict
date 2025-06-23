@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DiaPredict - Diabetes Prediction</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to right, #e0f7fa, #ffffff);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem 1rem;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: 3rem;
+      color: #0072ff;
+      margin-bottom: 1.5rem;
+      animation: fadeIn 1.2s ease-in-out;
+    }
+
+    .form-container, .output-container {
+      background: #ffffff;
+      padding: 2rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0, 114, 255, 0.15);
+      width: 100%;
+      max-width: 720px;
+      margin-bottom: 2rem;
+      animation: slideIn 1.2s ease-in-out;
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.4rem;
+      font-weight: 600;
+      color: #555;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.65rem;
+      border-radius: 0.5rem;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.9rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1.1rem;
+      background: #0072ff;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #0057cc;
+    }
+
+    .output-container {
+      display: none;
+      border-left: 5px solid #00c6ff;
+    }
+
+    .output-title {
+      font-size: 1.5rem;
+      color: #0072ff;
+      margin-bottom: 0.8rem;
+    }
+
+    .output-content {
+      font-size: 1.1rem;
+      color: #444;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <h1>DiaPredict</h1>
+
+  <div class="form-container">
+    <form id="predict-form" method="GET" action="predict/" target="_blank">
+    {% comment %} {% csrf_token %} {% endcomment %}
+      <div class="form-group">
+        <label for="gender">Gender</label>
+        <select id="gender" name="Gender">
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="age">Age</label>
+        <input type="number" id="age" name="AGE" required />
+      </div>
+      <div class="form-group">
+        <label for="urea">Urea</label>
+        <input type="number" step="any" id="urea" name="Urea" required />
+      </div>
+      <div class="form-group">
+        <label for="cr">Creatinine</label>
+        <input type="number" step="any" id="cr" name="Cr" required />
+      </div>
+      <div class="form-group">
+        <label for="hba1c">HbA1c</label>
+        <input type="number" step="any" id="hba1c" name="HbA1c" required />
+      </div>
+      <div class="form-group">
+        <label for="chol">Cholesterol</label>
+        <input type="number" step="any" id="chol" name="Chol" required />
+      </div>
+      <div class="form-group">
+        <label for="tg">Triglycerides</label>
+        <input type="number" step="any" id="tg" name="TG" required />
+      </div>
+      <div class="form-group">
+        <label for="hdl">HDL</label>
+        <input type="number" step="any" id="hdl" name="HDL" required />
+      </div>
+      <div class="form-group">
+        <label for="ldl">LDL</label>
+        <input type="number" step="any" id="ldl" name="LDL" required />
+      </div>
+      <div class="form-group">
+        <label for="vldl">VLDL</label>
+        <input type="number" step="any" id="vldl" name="VLDL" required />
+      </div>
+      <div class="form-group">
+        <label for="bmi">BMI</label>
+        <input type="number" step="any" id="bmi" name="BMI" required />
+      </div>
+      <button type="submit">Predict Diabetes</button>
+    </form>
+  </div>
+  <!-- Add this to your HTML -->
+  <div id="loading-spinner" style="display: none;">
+    ⏳ Calculating...
+  </div>
+
+  <div class="output-container" id="output-box">
+    <div class="output-title">Prediction Result</div>
+    <div class="output-content" id="output-content">
+      {{reponse}}
+    </div>
+  </div>
+  <script>
+document.getElementById("predict-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+    
+    const outputBox = document.getElementById("output-box");
+    const outputContent = document.getElementById("output-content");
+    const loadingSpinner = document.getElementById("loading-spinner");
+
+    // Show loading spinner
+    loadingSpinner.style.display = "block";
+    outputBox.style.display = "none"; // Hide previous result
+
+    fetch(`/predict/?${new URLSearchParams(new FormData(e.target))}`)
+        .then(response => {
+            if (!response.ok) throw new Error("Network error");
+            return response.json();
+        })
+        .then(data => {
+            outputContent.innerHTML = data.status;
+            outputBox.style.display = "block"; // Show result
+        })
+        .catch(error => {
+            outputContent.innerHTML = "❌ Error: " + error.message;
+            outputBox.style.display = "block"; // Show error
+        })
+        .finally(() => {
+            loadingSpinner.style.display = "none"; // Hide spinner
+        });
+});
+</script>
+  {% comment %} <script>
+    document.getElementById("predict-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      fetch(`/predict/?${new URLSearchParams(new FormData(e.target))}`)
+        .then(response => response.json())
+        .then(data => {
+                const outputBox = document.getElementById("output-box");
+                const outputContent = document.getElementById("output-content");
+                outputBox.style.display = "block";
+                outputContent.innerHTML = data.prediction;
+            
+        })
+        .catch(error => console.error("Error:", error));
+
+    });
+  </script>  {% endcomment %}
+
+</body>
+</html>
