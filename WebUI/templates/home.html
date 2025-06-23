@@ -201,22 +201,7 @@ document.getElementById("predict-form").addEventListener("submit", function(e) {
         });
 });
 </script>
-  {% comment %} <script>
-    document.getElementById("predict-form").addEventListener("submit", function (e) {
-      e.preventDefault();
-      fetch(`/predict/?${new URLSearchParams(new FormData(e.target))}`)
-        .then(response => response.json())
-        .then(data => {
-                const outputBox = document.getElementById("output-box");
-                const outputContent = document.getElementById("output-content");
-                outputBox.style.display = "block";
-                outputContent.innerHTML = data.prediction;
-            
-        })
-        .catch(error => console.error("Error:", error));
 
-    });
-  </script>  {% endcomment %}
 
 </body>
 </html>
