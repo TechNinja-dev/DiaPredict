@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>DiaPredict - Diabetes Prediction</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
     * {
       box-sizing: border-box;
@@ -14,12 +14,12 @@
     }
 
     body {
-      background: linear-gradient(to right, #e0f7fa, #ffffff);
+      background: linear-gradient(135deg, #f5f7fa 0%, #e0f7fa 100%);
       color: #333;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 3rem 1rem;
+      padding: 2rem 1rem;
       min-height: 100vh;
     }
 
@@ -28,69 +28,141 @@
       color: #0072ff;
       margin-bottom: 1.5rem;
       animation: fadeIn 1.2s ease-in-out;
+      text-align: center;
+      position: relative;
+      padding-bottom: 1rem;
+    }
+
+    h1::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(to right, #0072ff, #00c6ff);
+      border-radius: 2px;
     }
 
     .form-container, .output-container {
       background: #ffffff;
-      padding: 2rem;
+      padding: 2.5rem;
       border-radius: 1.5rem;
-      box-shadow: 0 10px 30px rgba(0, 114, 255, 0.15);
+      box-shadow: 0 15px 35px rgba(0, 114, 255, 0.1);
       width: 100%;
-      max-width: 720px;
+      max-width: 800px;
       margin-bottom: 2rem;
       animation: slideIn 1.2s ease-in-out;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .form-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      background: linear-gradient(to right, #0072ff, #00c6ff);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-top: 1.5rem;
     }
 
     .form-group {
-      margin-bottom: 1.2rem;
+      margin-bottom: 0;
+      position: relative;
     }
 
     label {
       display: block;
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.5rem;
       font-weight: 600;
       color: #555;
+      font-size: 0.95rem;
     }
 
     input, select {
       width: 100%;
-      padding: 0.65rem;
-      border-radius: 0.5rem;
-      border: 1px solid #ccc;
+      padding: 0.8rem 1rem;
+      border-radius: 0.75rem;
+      border: 1px solid #e0e0e0;
       font-size: 1rem;
+      transition: all 0.3s ease;
+      background-color: #f9f9f9;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #0072ff;
+      box-shadow: 0 0 0 3px rgba(0, 114, 255, 0.1);
+      background-color: #fff;
+    }
+
+    .submit-section {
+      grid-column: span 2;
+      margin-top: 1rem;
     }
 
     button {
       width: 100%;
-      padding: 0.9rem;
+      padding: 1rem;
       border: none;
-      border-radius: 0.5rem;
+      border-radius: 0.75rem;
       font-size: 1.1rem;
-      background: #0072ff;
+      background: linear-gradient(to right, #0072ff, #00c6ff);
       color: #fff;
       font-weight: bold;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3);
     }
 
     button:hover {
-      background: #0057cc;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 114, 255, 0.4);
     }
 
     .output-container {
       display: none;
       border-left: 5px solid #00c6ff;
+      text-align: center;
     }
 
     .output-title {
       font-size: 1.5rem;
       color: #0072ff;
-      margin-bottom: 0.8rem;
+      margin-bottom: 1rem;
+      font-weight: 700;
     }
 
     .output-content {
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       color: #444;
+      line-height: 1.6;
+    }
+
+    #loading-spinner {
+      display: none;
+      font-size: 1.2rem;
+      color: #0072ff;
+      margin: 1.5rem 0;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .form-icon {
+      position: absolute;
+      right: 15px;
+      top: 38px;
+      color: #0072ff;
+      opacity: 0.7;
     }
 
     @keyframes fadeIn {
@@ -102,6 +174,18 @@
       from { transform: scale(0.95); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
     }
+
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .submit-section {
+        grid-column: span 1;
+      }
+      h1 {
+        font-size: 2.2rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -109,99 +193,112 @@
 
   <div class="form-container">
     <form id="predict-form" method="GET" action="predict/" target="_blank">
-    {% comment %} {% csrf_token %} {% endcomment %}
-      <div class="form-group">
-        <label for="gender">Gender</label>
-        <select id="gender" name="Gender">
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-        </select>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="gender">Gender</label>
+          <select id="gender" name="Gender">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+          <span class="form-icon">👤</span>
+        </div>
+        <div class="form-group">
+          <label for="age">Age</label>
+          <input type="number" id="age" name="AGE" required placeholder="Enter your age" />
+          <span class="form-icon">🎂</span>
+        </div>
+        <div class="form-group">
+          <label for="urea">Urea (mg/dL)</label>
+          <input type="number" step="any" id="urea" name="Urea" required placeholder="e.g. 25.5" />
+          <span class="form-icon">🧪</span>
+        </div>
+        <div class="form-group">
+          <label for="cr">Creatinine (mg/dL)</label>
+          <input type="number" step="any" id="cr" name="Cr" required placeholder="e.g. 0.9" />
+          <span class="form-icon">🧫</span>
+        </div>
+        <div class="form-group">
+          <label for="hba1c">HbA1c (%)</label>
+          <input type="number" step="any" id="hba1c" name="HbA1c" required placeholder="e.g. 5.7" />
+          <span class="form-icon">🩸</span>
+        </div>
+        <div class="form-group">
+          <label for="chol">Cholesterol (mg/dL)</label>
+          <input type="number" step="any" id="chol" name="Chol" required placeholder="e.g. 200" />
+          <span class="form-icon">🧈</span>
+        </div>
+        <div class="form-group">
+          <label for="tg">Triglycerides (mg/dL)</label>
+          <input type="number" step="any" id="tg" name="TG" required placeholder="e.g. 150" />
+          <span class="form-icon">🧴</span>
+        </div>
+        <div class="form-group">
+          <label for="hdl">HDL (mg/dL)</label>
+          <input type="number" step="any" id="hdl" name="HDL" required placeholder="e.g. 60" />
+          <span class="form-icon">👍</span>
+        </div>
+        <div class="form-group">
+          <label for="ldl">LDL (mg/dL)</label>
+          <input type="number" step="any" id="ldl" name="LDL" required placeholder="e.g. 120" />
+          <span class="form-icon">👎</span>
+        </div>
+        <div class="form-group">
+          <label for="vldl">VLDL (mg/dL)</label>
+          <input type="number" step="any" id="vldl" name="VLDL" required placeholder="e.g. 30" />
+          <span class="form-icon">⚠️</span>
+        </div>
+        <div class="form-group">
+          <label for="bmi">BMI (kg/m²)</label>
+          <input type="number" step="any" id="bmi" name="BMI" required placeholder="e.g. 24.5" />
+          <span class="form-icon">⚖️</span>
+        </div>
+        <div class="submit-section">
+          <button type="submit">Predict Diabetes Risk</button>
+        </div>
       </div>
-      <div class="form-group">
-        <label for="age">Age</label>
-        <input type="number" id="age" name="AGE" required />
-      </div>
-      <div class="form-group">
-        <label for="urea">Urea</label>
-        <input type="number" step="any" id="urea" name="Urea" required />
-      </div>
-      <div class="form-group">
-        <label for="cr">Creatinine</label>
-        <input type="number" step="any" id="cr" name="Cr" required />
-      </div>
-      <div class="form-group">
-        <label for="hba1c">HbA1c</label>
-        <input type="number" step="any" id="hba1c" name="HbA1c" required />
-      </div>
-      <div class="form-group">
-        <label for="chol">Cholesterol</label>
-        <input type="number" step="any" id="chol" name="Chol" required />
-      </div>
-      <div class="form-group">
-        <label for="tg">Triglycerides</label>
-        <input type="number" step="any" id="tg" name="TG" required />
-      </div>
-      <div class="form-group">
-        <label for="hdl">HDL</label>
-        <input type="number" step="any" id="hdl" name="HDL" required />
-      </div>
-      <div class="form-group">
-        <label for="ldl">LDL</label>
-        <input type="number" step="any" id="ldl" name="LDL" required />
-      </div>
-      <div class="form-group">
-        <label for="vldl">VLDL</label>
-        <input type="number" step="any" id="vldl" name="VLDL" required />
-      </div>
-      <div class="form-group">
-        <label for="bmi">BMI</label>
-        <input type="number" step="any" id="bmi" name="BMI" required />
-      </div>
-      <button type="submit">Predict Diabetes</button>
     </form>
   </div>
-  <!-- Add this to your HTML -->
-  <div id="loading-spinner" style="display: none;">
-    ⏳ Calculating...
+
+  <div id="loading-spinner">
+    ⏳ Analyzing your health data...
   </div>
 
   <div class="output-container" id="output-box">
-    <div class="output-title">Prediction Result</div>
+    <div class="output-title">Your Diabetes Risk Assessment</div>
     <div class="output-content" id="output-content">
       {{reponse}}
     </div>
   </div>
+  
   <script>
-document.getElementById("predict-form").addEventListener("submit", function(e) {
-    e.preventDefault();
-    
-    const outputBox = document.getElementById("output-box");
-    const outputContent = document.getElementById("output-content");
-    const loadingSpinner = document.getElementById("loading-spinner");
+    document.getElementById("predict-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      
+      const outputBox = document.getElementById("output-box");
+      const outputContent = document.getElementById("output-content");
+      const loadingSpinner = document.getElementById("loading-spinner");
 
-    // Show loading spinner
-    loadingSpinner.style.display = "block";
-    outputBox.style.display = "none"; // Hide previous result
+      // Show loading spinner
+      loadingSpinner.style.display = "block";
+      outputBox.style.display = "none"; // Hide previous result
 
-    fetch(`/predict/?${new URLSearchParams(new FormData(e.target))}`)
-        .then(response => {
-            if (!response.ok) throw new Error("Network error");
-            return response.json();
-        })
-        .then(data => {
-            outputContent.innerHTML = data.status;
-            outputBox.style.display = "block"; // Show result
-        })
-        .catch(error => {
-            outputContent.innerHTML = "❌ Error: " + error.message;
-            outputBox.style.display = "block"; // Show error
-        })
-        .finally(() => {
-            loadingSpinner.style.display = "none"; // Hide spinner
-        });
-});
-</script>
-
-
+      fetch(`/predict/?${new URLSearchParams(new FormData(e.target))}`)
+          .then(response => {
+              if (!response.ok) throw new Error("Network error");
+              return response.json();
+          })
+          .then(data => {
+              outputContent.innerHTML = data.status;
+              outputBox.style.display = "block"; // Show result
+          })
+          .catch(error => {
+              outputContent.innerHTML = "❌ Error: " + error.message;
+              outputBox.style.display = "block"; // Show error
+          })
+          .finally(() => {
+              loadingSpinner.style.display = "none"; // Hide spinner
+          });
+    });
+  </script>
 </body>
 </html>
